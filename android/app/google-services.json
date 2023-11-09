@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "204087788099",
+    "project_id": "kadu-booking-app",
+    "storage_bucket": "kadu-booking-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:204087788099:android:f351b06b90831feddacaf6",
+        "android_client_info": {
+          "package_name": "com.example.kadu_booking_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI1h-zIEy4DmzaU__LLiXajfhwA4gcLAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
