@@ -115,6 +115,16 @@ class _HomePageState extends State<HomePage> {
               ),
               verticalSpaceRegular,
               CustomCarousel(),
+              verticalSpaceRegular,
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                alignment: Alignment.topLeft,
+                child: Text('Most Liked',
+                    style: GoogleFonts.poppins(
+                        fontSize: 20, color: AppColors.textColorPrimary)),
+              ),
+              verticalSpaceRegular,
+              CustomCarousel(),
 
               // ImageWithDescription(),
             ],

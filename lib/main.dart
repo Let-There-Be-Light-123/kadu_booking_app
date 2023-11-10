@@ -16,11 +16,6 @@ import 'package:kadu_booking_app/screens/signup/signup.dart';
 import 'package:kadu_booking_app/screens/splash/splash.dart';
 import 'package:kadu_booking_app/screens/verification/under_verification.dart';
 import 'package:kadu_booking_app/ui_widgets/settings_list/settings_list.dart';
-// import 'package:kadu_ngo/providers/router_provider.dart';
-// import 'package:kadu_ngo/screens/otp/otp.dart';
-// import 'package:kadu_ngo/screens/signin/signin.dart';
-// import 'package:kadu_ngo/screens/signup/signup.dart';
-// import 'package:kadu_ngo/screens/splash/splash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,10 +28,6 @@ class HotelBookingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: MainScreen(),
-      // home: BlocProvider(
-      //   create: (context) => SettingsBloc(),
-      //   child: SettingsPage(),
-      // ),
       routes: {
         '/profile': (context) => Otp(),
         '/contactUs': (context) => Otp(),
