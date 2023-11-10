@@ -183,12 +183,16 @@ class _SignInScreenState extends State<SignInScreen> {
                           width: width * .9,
                           child: TextFormField(
                             controller: emailController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 9,
                             decoration: const InputDecoration(
                               hintText: "Email/ Username",
                               border: OutlineInputBorder(),
                             ),
                             validator: (value) {
-                              if (value == null || value.isEmpty) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.length < 9) {
                                 return 'Please enter valid social security number';
                               } else {
                                 return null;
@@ -264,9 +268,12 @@ class _SignInScreenState extends State<SignInScreen> {
                       minWidth: double.infinity,
                       height: 45,
                       onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
+                        if (_formKey.currentState!.validate() &&
+                            emailController.text.length == 9) {
                           RegisteredUser? currentUser = await handleLogin(
                               emailController.text, passwordController.text);
+
+                          print(currentUser);
 
                           if (currentUser != null) {
                             if (rememberMe) {
@@ -279,12 +286,15 @@ class _SignInScreenState extends State<SignInScreen> {
                             }
                           }
 
-                          if (currentUser!.is_verified) {
+                          if (currentUser != null &&
+                              currentUser.is_verified == true) {
+                            print("user is verified");
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                   builder: (context) => MainScreen()),
                             );
                           } else {
+                            print("The user isn't verified");
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                   builder: (context) => VerificationScreen()),

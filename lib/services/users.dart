@@ -4,7 +4,7 @@ class RegisteredUser {
   String id; // Unique user ID
   String email;
   bool is_verified;
-  Int ssnid;
+  int ssnid;
 
   RegisteredUser({
     required this.ssnid,

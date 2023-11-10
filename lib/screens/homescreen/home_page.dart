@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 20, color: AppColors.textColorPrimary)),
               ),
               verticalSpaceRegular,
-              // CustomCarousel(),
+              CustomCarousel(),
 
               // ImageWithDescription(),
             ],

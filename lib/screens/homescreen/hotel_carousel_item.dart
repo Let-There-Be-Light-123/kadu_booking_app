@@ -1,89 +1,126 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:kadu_booking_app/theme/color.dart';
 
-class ImageWithDescription extends StatefulWidget {
-  final String imageUrl;
-  final String description;
+class CarouselWidget extends StatefulWidget {
+  String imageURL;
+  String title;
+  String subTitle;
 
-  ImageWithDescription({required this.imageUrl, required this.description});
+  CarouselWidget(
+      {super.key,
+      required this.imageURL,
+      required this.title,
+      required this.subTitle});
 
   @override
-  _ImageWithDescriptionState createState() => _ImageWithDescriptionState();
+  State<CarouselWidget> createState() => _CarouselWidgetState();
 }
 
-class _ImageWithDescriptionState extends State<ImageWithDescription> {
-  bool isLiked = false;
-  int likes = 0;
-
-  void toggleLike() {
-    setState(() {
-      isLiked = !isLiked;
-      if (isLiked) {
-        likes++;
-      } else {
-        likes--;
-      }
-    });
-  }
+class _CarouselWidgetState extends State<CarouselWidget> {
+  bool isFavorite = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
-        children: [
-          // Image
-          Image.network(
-            widget.imageUrl,
-            fit: BoxFit.fill,
-            height: 100,
-            width: MediaQuery.of(context).size.width - 20,
-          ),
-          // Like button at the bottom-right corner
-          Positioned(
-            right: 8.0,
-            bottom: 8.0,
-            child: IconButton(
-              icon: isLiked
-                  ? Icon(Icons.favorite, color: Colors.red)
-                  : Icon(Icons.favorite_border),
-              onPressed: toggleLike,
-            ),
-          ),
-          Column(
-            children: [
-              SizedBox(
-                  height:
-                      150), // Spacer to ensure the button appears at the bottom
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.description,
-                      style: TextStyle(
-                        color: AppColors.textColorPrimary,
-                        fontFamily: GoogleFonts.poppins().fontFamily,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return PageView(
+      children: [
+        CarouselItem(
+          image: widget.imageURL,
+          title: widget.title,
+          subtitle: widget.subTitle,
+          isFavorite: isFavorite,
+          onFavoriteToggle: () {
+            setState(() {
+              isFavorite = !isFavorite;
+              print(isFavorite);
+            });
+          },
+        ),
+        // Add more CarouselItem widgets as needed
+      ],
     );
   }
 }
 
-class Description extends StatelessWidget {
-  const Description({super.key});
+class CarouselItem extends StatelessWidget {
+  final String image;
+  final String title;
+  final String subtitle;
+  final bool isFavorite;
+  final VoidCallback onFavoriteToggle;
+
+  CarouselItem({
+    required this.image,
+    required this.title,
+    required this.subtitle,
+    required this.isFavorite,
+    required this.onFavoriteToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Placeholder();
+    return Container(
+      height: 500,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: Colors.white,
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            flex: 6,
+            child: Card(
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Stack(
+                children: [
+                  Image.network(
+                    image,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: onFavoriteToggle,
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

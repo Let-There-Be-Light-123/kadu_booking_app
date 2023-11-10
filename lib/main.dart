@@ -32,7 +32,7 @@ class HotelBookingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SignupPage(),
+      home: MainScreen(),
       // home: BlocProvider(
       //   create: (context) => SettingsBloc(),
       //   child: SettingsPage(),

@@ -4,14 +4,17 @@ import 'package:kadu_booking_app/services/users.dart';
 
 Future<RegisteredUser?> handleLogin(String email, String password) async {
   try {
+    String user = '$email@12345adivivekdomain.com';
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     UserCredential userCredential =
         await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
+      email: user,
       password: password,
     );
+    print("login success");
 
     String userId = userCredential.user!.uid;
+    print(userId);
     QuerySnapshot querySnapshot = await firestore
         .collection('registered_users')
         .where('user_id', isEqualTo: userId)
