@@ -40,23 +40,22 @@ class HotelTile extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: Container(
-                            height: 20,
-                            width: 20,
-                            child: Image.asset('assets/bundlow.png'),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, top: 10),
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              height: 20,
+                              width: 20,
+                              child: Image.asset('assets/bundlow.png'),
+                            ),
                           ),
-                        ),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: StackedIconsButton(),
                         ),
                       ],
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.all(5),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
                         'Luxurious Haven villa',
                         style: GoogleFonts.poppins(
