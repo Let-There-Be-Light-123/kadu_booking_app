@@ -1,94 +1,119 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:kadu_booking_app/api/property_service.dart';
+import 'package:kadu_booking_app/providers/userdetailsprovider.dart';
 import 'package:kadu_booking_app/theme/color.dart';
 import 'package:kadu_booking_app/ui_widgets/hoteldescription/hotel_description.dart';
-import 'package:kadu_booking_app/uihelper/uihelper.dart';
-
-final List<Map<String, String>> imageData = [
-  {'imageUrl': 'assets/hotel_2.png', 'imageDesc': ''},
-  {'imageUrl': 'assets/hotel_3.png', 'imageDesc': ''},
-  {'imageUrl': 'assets/hotel_4.png', 'imageDesc': ''},
-  {'imageUrl': 'assets/hotel_1.png', 'imageDesc': ''}
-];
+import 'package:share/share.dart';
 
 class PropertyDetailPage extends StatefulWidget {
-  const PropertyDetailPage({super.key});
+  final String propertyId;
+  final UserDetailsProvider? userDetailsProvider; // Pass userDetailsProvider
+
+  const PropertyDetailPage({
+    Key? key,
+    required this.propertyId,
+    this.userDetailsProvider,
+  }) : super(key: key);
 
   @override
   State<PropertyDetailPage> createState() => _PropertyDetailPageState();
 }
 
 class _PropertyDetailPageState extends State<PropertyDetailPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: MediaQuery.of(context).size.height,
-          color: AppColors.backgroundColorDefault,
-        ),
-        HotelDescription(),
-        Material(
-          color: Colors.transparent,
-          child: IconButton(
-            icon: Icon(Icons.arrow_back),
-            iconSize: 25,
-            color: AppColors.primaryColorOrange,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              width: MediaQuery.sizeOf(context).width,
-              child: Container(
-                color: Colors.transparent,
-                height: 50,
-                width: 200,
-                child: MaterialButton(
-                  onPressed: () {},
-                  child: Text('Book now'),
-                  textColor: Colors.white,
-                  color: AppColors.primaryColorOrange,
-                ),
-              ),
-            ))
-      ],
-    );
+  late Property propertyData = Property();
+  bool isLoading = true;
+  bool isError = false;
+
+  String buildShareableUrl(String propertyId) {
+    String baseUrl = 'your_base_url';
+    Uri shareableUri =
+        Uri.parse('$baseUrl/property-details?propertyId=$propertyId');
+    return shareableUri.toString();
   }
-}
 
-class DetailPageWrapper extends StatelessWidget {
-  const DetailPageWrapper({super.key});
+  Future<void> _loadPropertyData() async {
+    try {
+      var data = await fetchPropertyData(widget.propertyId);
+      Future.delayed(Duration(seconds: 4), () {
+        if (mounted) {
+          setState(() {
+            propertyData = data!;
+            isLoading = false;
+          });
+        }
+      });
+    } catch (error) {
+      Future.delayed(Duration.zero, () {
+        if (mounted) {
+          setState(() {
+            isError = true;
+            isLoading = false;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPropertyData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(
-          icon: Icon(Icons.arrow_back),
-          iconSize: 25,
-          color: AppColors.primaryColorOrange,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        Container(
-          color: AppColors.backgroundColorDefault,
-          alignment: Alignment.bottomCenter,
-          child: MaterialButton(
-            onPressed: () {},
-            minWidth: 300,
-            child: Text('Book now'),
-            textColor: Colors.white,
-            color: AppColors.primaryColorOrange,
+    if (isLoading) {
+      return Container(
+        alignment: Alignment.center,
+        color: Colors.white,
+        child: Image.asset('assets/shelter_360.gif'),
+      );
+    } else if (isError) {
+      return Text('Failed to load property data. Please try again.');
+    }
+
+    return Container(
+      padding: EdgeInsets.only(top: 15),
+      child: Stack(
+        children: [
+          Container(
+            height: MediaQuery.of(context).size.height,
+            color: AppColors.backgroundColorDefault,
           ),
-        )
-      ],
+          HotelDescription(
+            propertyData: propertyData,
+            userDetailsProvider: widget.userDetailsProvider,
+            onAvailabilityChanged: (bool availability) {},
+          ),
+          Material(
+            color: Colors.transparent,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  iconSize: 25,
+                  color: AppColors.primaryColorOrange,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.share_rounded),
+                  iconSize: 25,
+                  color: AppColors.primaryColorOrange,
+                  onPressed: () {
+                    String propertyId = widget.propertyId;
+                    String shareableUrl = buildShareableUrl(propertyId);
+                    Share.share(shareableUrl,
+                        subject: 'Check out this property!');
+                  },
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

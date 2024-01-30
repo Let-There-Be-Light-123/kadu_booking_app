@@ -11,7 +11,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(Duration(seconds: 7), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => SignInScreen()),
       );
@@ -21,12 +21,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColorDefault,
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset('assets/K-adu Animated logo.gif'),
+            Image.asset('assets/shelter_splash.gif'),
           ],
         ),
       ),

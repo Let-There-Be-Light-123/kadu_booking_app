@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:kadu_booking_app/theme/color.dart';
 import 'package:kadu_booking_app/uihelper/uihelper.dart';
@@ -17,15 +15,15 @@ class NavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(
-        bottom: Platform.isAndroid ? 16 : 0,
-      ),
+      // margin: EdgeInsets.only(
+      //   bottom: Platform.isAndroid ? 16 : 0,
+      // ),
       child: BottomAppBar(
         elevation: 0.0,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Container(
-            height: 60,
+            // height: 60,
             color: Color(0xFFFFFFFF),
             child: Row(
               children: [
@@ -72,12 +70,15 @@ class NavBar extends StatelessWidget {
             verticalSpaceRegular,
             Icon(
               icon,
-              size: 25,
+              size: 24,
               color: selected
                   ? AppColors.primaryColorOrange
                   : Colors.black.withOpacity(0.4),
             ),
-            Text(desc),
+            Text(
+              desc,
+              style: TextStyle(fontSize: 10),
+            ),
           ],
         ),
       ),

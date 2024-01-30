@@ -1,74 +1,95 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kadu_booking_app/blocs/favorite/favorite_bloc.dart';
+import 'package:kadu_booking_app/providers/userdetailsprovider.dart';
 import 'package:kadu_booking_app/screens/homescreen/hotel_carousel_item.dart';
-import 'package:kadu_booking_app/services/stay_model.dart';
+import 'package:kadu_booking_app/screens/propertydetails/property_detail_page.dart';
 import 'package:provider/provider.dart';
 
 class CustomCarousel extends StatefulWidget {
-  const CustomCarousel({super.key});
+  final propertyData;
 
+  const CustomCarousel({Key? key, required this.propertyData})
+      : super(key: key);
   @override
   State<CustomCarousel> createState() => _CustomCarouselState();
 }
 
 class _CustomCarouselState extends State<CustomCarousel> {
+  String baseUrl = '${dotenv.env['API_URL']}';
+
   @override
   Widget build(BuildContext context) {
+    List<Map<String, String>> carouselData = [];
+    if (widget.propertyData != null &&
+        widget.propertyData is List &&
+        widget.propertyData.length > 0) {
+      for (var property in widget.propertyData) {
+        Map<String, String> carouselItem = {
+          'property_id': property['property_id'] ?? '',
+          'title': property['property_name'] ?? '',
+          'description': property['property_description'] ?? '',
+          'imageURL': (property['files'] != null &&
+                  property['files']!.isNotEmpty)
+              ? '$baseUrl/storage/public/uploads/properties/${property['property_id']}/${property['files']![0]['filename']}'
+              : '$baseUrl/storage/public/uploads/default/not_found.png',
+          'address': property['address'] ?? '',
+        };
+        carouselData.add(carouselItem);
+      }
+      // print("Setting data for carousel");
+    }
+
     return Container(
       alignment: Alignment.centerLeft,
-      child: NoonLoopingDemo(),
+      child: NoonLoopingDemo(imageData: carouselData),
     );
   }
 }
 
-final List<Map<String, String>> imageData = [
-  {
-    'imageUrl':
-        'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-    'description': 'Luxurious haven Villa',
-    'id': '1'
-  },
-  {
-    'imageUrl':
-        'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-    'description': 'Modern Apartments',
-    'id': '2'
-  },
-  {
-    'imageUrl':
-        'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-    'description': 'Oceanfront Stay',
-    'id': '3'
-  },
-  {
-    'imageUrl':
-        'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
-    'description': 'Contemporary Oasis Bunglow',
-    'id': '4'
-  },
-];
-
 class NoonLoopingDemo extends StatelessWidget {
+  final List<Map<String, String>> imageData;
+
+  NoonLoopingDemo({required this.imageData});
+
   @override
   Widget build(BuildContext context) {
+    String baseUrl = '${dotenv.env['API_URL']}';
     return ChangeNotifierProvider(
-        create: (context) => FavoriteModel(),
-        child: Container(
-            alignment: Alignment.centerLeft,
-            child: CarouselSlider(
-              options: CarouselOptions(
-                enableInfiniteScroll: false,
-                initialPage: 0,
-              ),
-              items: imageData.map((data) {
-                return CarouselWidget(
-                  imageURL: data['imageUrl']!,
-                  title: data['description']!,
-                  subTitle: 'This is hotel',
-                  id: data['id']!,
+      create: (context) => FavoriteModel(),
+      child: Container(
+        alignment: Alignment.centerLeft,
+        child: CarouselSlider(
+          options: CarouselOptions(
+            padEnds: false,
+            enableInfiniteScroll: false,
+            initialPage: 0,
+          ),
+          items: imageData.map((data) {
+            String? filePath = data['imageURL'];
+            print('$baseUrl$filePath');
+            return CarouselWidget(
+              imageURL: data['imageURL'] ?? '',
+              title: data['title'] ?? '',
+              subTitle: data['address'] ?? '',
+              id: data['property_id'] ?? '',
+              onTapCallback: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PropertyDetailPage(
+                        userDetailsProvider: Provider.of<UserDetailsProvider>(
+                            context,
+                            listen: false),
+                        propertyId: data['property_id'] ?? ''),
+                  ),
                 );
-              }).toList(),
-            )));
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 }

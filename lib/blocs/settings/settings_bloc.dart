@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kadu_booking_app/blocs/settings/settings_event.dart';
 import 'package:kadu_booking_app/blocs/settings/settings_state.dart';
 

@@ -1,16 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kadu_booking_app/screens/signin/signin.dart';
 import 'package:kadu_booking_app/theme/color.dart';
 import 'package:kadu_booking_app/ui_widgets/profile/profile.dart';
 import 'package:kadu_booking_app/ui_widgets/settings_list/settings_list.dart';
 import 'package:kadu_booking_app/uihelper/uihelper.dart';
 
 class SettingsPage extends StatelessWidget {
+  final VoidCallback logoutCallBack;
   final String tab;
 
-  const SettingsPage({super.key, required this.tab});
+  SettingsPage({super.key, required this.tab, required this.logoutCallBack});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class SettingsPage extends StatelessWidget {
             ProfileWidget(),
             verticalSpaceRegular,
             ClickableWidgetList(),
-            verticalSpaceLarge,
+            verticalSpaceRegular,
             Container(
                 width: MediaQuery.of(context).size.width - 40,
                 child: Container(
@@ -45,25 +45,7 @@ class SettingsPage extends StatelessWidget {
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.orange),
                     ),
-                    onPressed: () async {
-                      try {
-                        await FirebaseAuth.instance.signOut();
-                        // Navigate to the login screen if sign-out is successful
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SignInScreen()),
-                        );
-                      } catch (e) {
-                        // If there's an error during sign-out, show a SnackBar with the error message
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Error signing out: $e"),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: logoutCallBack,
                     icon: Icon(
                       Icons.power_settings_new,
                       color: Colors.white,
@@ -76,7 +58,8 @@ class SettingsPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                ))
+                )),
+            verticalSpaceLarge
           ],
         ),
       )),

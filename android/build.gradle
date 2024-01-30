@@ -4,15 +4,16 @@ buildscript {
         google()
         mavenCentral()
     }
-
+// ma'am
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // classpath ("PLUGIN_MAVEN_COORDINATES:PLUGIN_VERSION")
         classpath 'com.google.gms:google-services:4.3.8'
-
+        // classpath "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1"
     }
 }
+
 
 allprojects {
     repositories {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 
@@ -26,15 +27,15 @@ class MediaPermissionHandler {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Media Permission'),
-            content: Text(
+            title: const Text('Media Permission'),
+            content: const Text(
                 'This app needs access to your media. Would you like to grant permission?'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                 },
-                child: Text('Deny'),
+                child: const Text('Deny'),
               ),
               TextButton(
                 onPressed: () async {
@@ -44,13 +45,17 @@ class MediaPermissionHandler {
                   if (granted) {
                     Navigator.of(context).pop(); // Close the dialog
                     // Perform actions that require media permission
-                    print("Media permission granted!");
+                    if (kDebugMode) {
+                      print("Media permission granted!");
+                    }
                   } else {
                     // Handle the case where permission is still not granted
-                    print("Media permission denied!");
+                    if (kDebugMode) {
+                      print("Media permission denied!");
+                    }
                   }
                 },
-                child: Text('Allow'),
+                child: const Text('Allow'),
               ),
             ],
           );
