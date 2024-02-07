@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:kadu_booking_app/models/property_model.dart';
 import 'package:kadu_booking_app/models/file_model.dart';
+import 'package:kadu_booking_app/models/review_model.dart';
 
 class Room {
   final String? roomId;
@@ -124,5 +125,23 @@ Future<Property?> fetchPropertyData(String propertyId) async {
     return property;
   } else {
     throw Exception('Failed to load property data');
+  }
+}
+
+Future<List<Review>> fetchPropertyReviews(String propertyId, int offset) async {
+  final url = Uri.parse('${dotenv.env['API_URL']}/api/properties/reviews');
+  final body = json.encode({'property_id': propertyId, 'offset': offset});
+
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: body,
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> jsonData = json.decode(response.body);
+    return jsonData.map((reviewJson) => Review.fromJson(reviewJson)).toList();
+  } else {
+    throw Exception('Failed to load property reviews');
   }
 }

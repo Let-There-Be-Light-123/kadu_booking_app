@@ -1,6 +1,9 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_key_in_widget_constructors
 
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -14,13 +17,17 @@ import 'package:kadu_booking_app/theme/color.dart';
 import 'package:kadu_booking_app/ui_widgets/bookingcalendar/booking_calendar.dart';
 import 'package:kadu_booking_app/ui_widgets/hoteldescription/image_carousel.dart';
 import 'package:kadu_booking_app/uihelper/uihelper.dart';
+import 'package:rate_in_stars/rate_in_stars.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
+import 'package:http/http.dart' as http;
 
 class HotelDescription extends StatefulWidget {
   final Function(bool) onAvailabilityChanged;
   final Property propertyData;
-  final UserDetailsProvider? userDetailsProvider; // Make it optional
+  final UserDetailsProvider? userDetailsProvider;
 
   HotelDescription({
     Key? key,
@@ -41,102 +48,22 @@ class _HotelDescriptionState extends State<HotelDescription> {
   List<Room>? availableRooms;
   late List<Widget> carouselItems;
   bool isPropertyFavorite = false;
+  int offset = 0;
+  List<Review> reviews = [];
 
   bool isReviewCollapsed = false;
   late List<Review> allReviews;
   int reviewsToShow = 5;
-  List<Review> sampleReviews = [
-    Review(
-      id: '1',
-      userId: 'user1',
-      propertyId: 'property1',
-      rating: 4,
-      comment: 'Great experience! Highly recommended.',
-      createdAt: DateTime.now().subtract(const Duration(days: 5)),
-    ),
-    Review(
-      id: '2',
-      userId: 'user2',
-      propertyId: 'property1',
-      rating: 5,
-      comment: 'Fantastic service and amenities.',
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    Review(
-      id: '3',
-      userId: 'user3',
-      propertyId: 'property2',
-      rating: 3,
-      comment: 'Good place, but could be better.',
-      createdAt: DateTime.now().subtract(const Duration(days: 10)),
-    ),
-    Review(
-      id: '4',
-      userId: 'user4',
-      propertyId: 'property3',
-      rating: 2,
-      comment: 'Disappointing experience. Needs improvement.',
-      createdAt: DateTime.now().subtract(const Duration(days: 8)),
-    ),
-    Review(
-      id: '5',
-      userId: 'user5',
-      propertyId: 'property4',
-      rating: 4,
-      comment: 'Enjoyed my stay. Clean and comfortable.',
-      createdAt: DateTime.now().subtract(const Duration(days: 12)),
-    ),
-    Review(
-      id: '6',
-      userId: 'user6',
-      propertyId: 'property3',
-      rating: 3,
-      comment: 'Average place. Not bad, not great.',
-      createdAt: DateTime.now().subtract(const Duration(days: 15)),
-    ),
-    Review(
-      id: '7',
-      userId: 'user7',
-      propertyId: 'property2',
-      rating: 5,
-      comment: 'Absolutely amazing! Will come back again.',
-      createdAt: DateTime.now().subtract(const Duration(days: 7)),
-    ),
-    Review(
-      id: '8',
-      userId: 'user8',
-      propertyId: 'property5',
-      rating: 4,
-      comment: 'Friendly staff and beautiful surroundings.',
-      createdAt: DateTime.now().subtract(const Duration(days: 20)),
-    ),
-    Review(
-      id: '9',
-      userId: 'user9',
-      propertyId: 'property4',
-      rating: 1,
-      comment: 'Terrible experience. Avoid at all costs.',
-      createdAt: DateTime.now().subtract(const Duration(days: 25)),
-    ),
-    Review(
-      id: '10',
-      userId: 'user10',
-      propertyId: 'property5',
-      rating: 5,
-      comment: 'Paradise on Earth! Exceeded my expectations.',
-      createdAt: DateTime.now().subtract(const Duration(days: 30)),
-    )
-  ];
 
   late UserDetailsProvider userDetailsProvider;
 
   final Completer<GoogleMapController> _controller = Completer();
 
   void _handleAvailabilityChange(bool isAvailable, List<Room> rooms,
-      DateTime _checkInDate, DateTime _checkOutDate) {
+      DateTime checkInDate, DateTime checkOutDate) {
     setState(() {
-      checkInDate = _checkInDate;
-      checkOutDate = _checkOutDate;
+      checkInDate = checkInDate;
+      checkOutDate = checkOutDate;
       _isAvailable = isAvailable;
       availableRooms = rooms;
     });
@@ -184,9 +111,9 @@ class _HotelDescriptionState extends State<HotelDescription> {
     super.initState();
     userDetailsProvider = widget.userDetailsProvider ?? UserDetailsProvider();
     checkFavoriteStatus();
-    printImageURL();
+    // printImageURL();
     setCarouselImages();
-    fetchReviews(); // Fetch the initial set of reviews
+    fetchReviews();
   }
 
   void printImageURL() {
@@ -245,9 +172,7 @@ class _HotelDescriptionState extends State<HotelDescription> {
         return Dialog(
           backgroundColor: Colors.transparent,
           child: SizedBox(
-            width: MediaQuery.of(context)
-                .size
-                .width, // Set the width to screen width
+            width: MediaQuery.of(context).size.width,
             child: imageWidget,
           ),
         );
@@ -293,17 +218,80 @@ class _HotelDescriptionState extends State<HotelDescription> {
     }
   }
 
-  void fetchReviews() {
-    setState(() {
-      sampleReviews = List.generate(
-          20,
-          (index) => Review(
-                id: index.toString(),
-              ));
-    });
+  fetchReviews() async {
+    debugPrint('Review funtion');
+
+    final url = Uri.parse('${dotenv.env['API_URL']}/api/properties/reviews');
+    final body = json.encode(
+        {'property_id': widget.propertyData.propertyId, 'offset': offset});
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> reviewData = jsonData['data'];
+      final List<Review> tempReviews = reviewData.map((reviewJson) {
+        List<String> photoPaths = extractPhotoPaths(reviewJson);
+        return Review(
+          id: reviewJson['id'],
+          rating: reviewJson['rating'].toDouble(), // Convert int to double
+          comment: reviewJson['comment'],
+          userId: reviewJson['user']['id'],
+          userName: reviewJson['user']['name'],
+          photos: photoPaths,
+          createdAt: DateTime.parse(reviewJson['created_at']),
+        );
+      }).toList();
+      setState(() {
+        reviews.addAll(tempReviews);
+      });
+      final nextOffset = jsonData['next_offset'];
+      offset = nextOffset;
+      debugPrint('Reviews count: ${reviews.length}');
+
+      for (var review in reviews) {
+        debugPrint('Review ID: ${review.id}');
+        debugPrint('Rating: ${review.rating}');
+        debugPrint('Comment: ${review.comment}');
+        debugPrint('User ID: ${review.userId}');
+        debugPrint('User Name: ${review.userName}');
+        debugPrint('Photos:');
+        if (review.photos != null) {
+          for (var photoPath in review.photos!) {
+            debugPrint('- $photoPath');
+          }
+        }
+        debugPrint('Created At: ${review.createdAt}');
+        debugPrint('-------------------------------------');
+      }
+      debugPrint('Next Offset $nextOffset');
+    } else {
+      throw Exception('Failed to load property reviews');
+    }
   }
 
-  void loadMoreReviews() {
+  List<String> extractPhotoPaths(Map<String, dynamic> reviewJson) {
+    List<dynamic> files = reviewJson['files'];
+    List<String> photoPaths = [];
+
+    for (var file in files) {
+      String filePath = file['filepath'];
+      String fileName = file['filename'];
+      String completeFilePath =
+          '${dotenv.env['API_URL']}/storage/$filePath/$fileName';
+      photoPaths.add(completeFilePath);
+    }
+
+    return photoPaths;
+  }
+
+  void loadMoreReviews() async {
+    debugPrint('Offset is  $offset');
+    await fetchReviews();
     setState(() {
       reviewsToShow += 5;
     });
@@ -575,7 +563,6 @@ class _HotelDescriptionState extends State<HotelDescription> {
                       mapType: MapType.normal,
                       zoomGesturesEnabled: false,
                       zoomControlsEnabled: false,
-                      // Add this line to enable zoom controls
                       onMapCreated: _onMapCreated,
                       initialCameraPosition: CameraPosition(
                         target: getPropertyLocation(),
@@ -613,45 +600,108 @@ class _HotelDescriptionState extends State<HotelDescription> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: isReviewCollapsed ? 5 : reviewsToShow,
+                        itemCount: isReviewCollapsed
+                            ? 5
+                            : min(reviewsToShow, reviews.length),
                         itemBuilder: (context, index) {
-                          final review = sampleReviews[index];
-                          return Card(
-                            elevation: 3,
-                            margin: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 8,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'User: ${review.userId}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    review.comment ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
+                          final review = reviews[index];
+                          return ExpansionTile(
+                            title: Text(
+                              '${review.userName}: ${review.comment}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
                             ),
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    verticalSpaceSmall,
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          'Rating: ',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        RatingStars(
+                                          rating: review.rating ?? 0.0,
+                                          color: Colors.amber,
+                                          iconSize: 32,
+                                          editable: false,
+                                        ),
+                                      ],
+                                    ),
+                                    verticalSpaceSmall,
+                                    Text(
+                                      review.comment ?? '',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                      softWrap: true,
+                                    ),
+                                    verticalSpaceRegular,
+                                    if (review.photos!.isNotEmpty)
+                                      Container(
+                                        height: 80.0,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(30.0),
+                                        ),
+                                        child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: review.photos?.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                // Navigate to fullscreen image view
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) =>
+                                                        FullScreenImageView(
+                                                      imageUrls:
+                                                          review.photos ?? [],
+                                                      initialIndex: index,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Container(
+                                                margin:
+                                                    const EdgeInsets.all(10.0),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
+                                                ),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
+                                                  child: Image.network(
+                                                    review.photos![index],
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    verticalSpaceRegular,
+                                  ],
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
-
-                      // Add a collapse button
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
@@ -677,6 +727,69 @@ class _HotelDescriptionState extends State<HotelDescription> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ZoomableImageGallery extends StatelessWidget {
+  final List<String> images;
+  final int initialIndex;
+
+  const ZoomableImageGallery(
+      {required this.images, required this.initialIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: PhotoViewGallery.builder(
+        itemCount: images.length,
+        builder: (context, index) {
+          return PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(images[index]),
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.covered * 2,
+          );
+        },
+        scrollPhysics: BouncingScrollPhysics(),
+        backgroundDecoration: const BoxDecoration(
+          color: Colors.black,
+        ),
+        pageController: PageController(initialPage: initialIndex),
+      ),
+    );
+  }
+}
+
+class FullScreenImageView extends StatelessWidget {
+  final List<String> imageUrls;
+  final int initialIndex;
+
+  const FullScreenImageView({
+    required this.imageUrls,
+    required this.initialIndex,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          // title: Text('Full Screen Image View'),
+          ),
+      body: PhotoViewGallery.builder(
+        itemCount: imageUrls.length,
+        builder: (context, index) {
+          return PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(imageUrls[index]),
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.covered * 2,
+          );
+        },
+        scrollPhysics: const BouncingScrollPhysics(),
+        backgroundDecoration: BoxDecoration(
+          color: Colors.black,
+        ),
+        pageController: PageController(initialPage: initialIndex),
       ),
     );
   }

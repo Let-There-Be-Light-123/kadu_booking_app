@@ -1,8 +1,6 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_element, prefer_final_fields, deprecated_member_use
 
 import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -21,6 +19,7 @@ import 'package:kadu_booking_app/services/checkpermissions.dart';
 import 'package:kadu_booking_app/services/filepermission/file_permission_service.dart';
 import 'package:kadu_booking_app/services/locationservice/location_permission.dart';
 import 'package:kadu_booking_app/services/mediahandler/media_handler.dart';
+import 'package:kadu_booking_app/ui_widgets/hexagonalfab/hexagonal_fab.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -91,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SignInScreen(),
+                      builder: (context) => const SignInScreen(),
                     ),
                   );
                 } else {
@@ -106,7 +105,7 @@ class _MainScreenState extends State<MainScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("Error signing out: $e"),
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }
@@ -221,7 +220,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var name = userDetails?.name ?? 'N/A';
     return WillPopScope(
       onWillPop: () {
         if (items[selectedTab].navKey.currentState?.canPop() ?? false) {
@@ -233,7 +231,7 @@ class _MainScreenState extends State<MainScreen> {
         }
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: false, // Add this line
+        resizeToAvoidBottomInset: true,
         body: IndexedStack(
           index: selectedTab,
           children: items
@@ -247,25 +245,18 @@ class _MainScreenState extends State<MainScreen> {
                   ))
               .toList(),
         ),
-        bottomNavigationBar: Container(
-          child: NavBar(
-            pageIndex: selectedTab,
-            onTap: (index) async {
-              if (index == selectedTab) {
-                items[index]
-                    .navKey
-                    ?.currentState
-                    ?.popUntil((route) => route.isFirst);
-              } else {
-                await _handleTabSelection(index);
-              }
-            },
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Container(
-          margin: const EdgeInsets.only(top: 80),
-          child: HexagonalFab(),
+        bottomNavigationBar: NavBar(
+          pageIndex: selectedTab,
+          onTap: (index) async {
+            if (index == selectedTab) {
+              items[index]
+                  .navKey
+                  .currentState
+                  ?.popUntil((route) => route.isFirst);
+            } else {
+              await _handleTabSelection(index);
+            }
+          },
         ),
       ),
     );
@@ -279,110 +270,5 @@ class _MainScreenState extends State<MainScreen> {
     if (index == 2) {
       await userDetailsProvider.getFavoriteProperties();
     }
-  }
-}
-
-class HexagonalFab extends StatelessWidget {
-  void _showIconSelectionSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: kBottomNavigationBarHeight +
-                MediaQuery.of(context).padding.bottom,
-          ),
-          child: Container(
-            padding: EdgeInsets.all(16),
-            child: Container(
-              child: Image.asset('assets/coming-soon.gif'),
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-        angle: 90 * 3.14159265359 / 180,
-        child: ClipPath(
-          clipper: HexagonalClipper(),
-          child: FloatingActionButton(
-            backgroundColor: Colors.orange,
-            elevation: 1,
-            onPressed: () {
-              debugPrint("Add Button pressed");
-              _showIconSelectionSheet(context);
-            },
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-          ),
-        ));
-  }
-}
-
-class HexagonalClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final radius = size.width / 2;
-    final centerX = size.width / 2;
-    final centerY = size.height / 2;
-
-    // Calculate the points for the hexagon
-    for (int i = 0; i < 6; i++) {
-      final angle = 2.0 * i * 3.14159265359 / 6;
-      final x = centerX + radius * cos(angle);
-      final y = centerY + radius * sin(angle);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
-}
-
-class VerticalHexagonalClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final radius = size.height / 2;
-    final centerX = size.width / 2;
-    final centerY = size.height / 2;
-
-    // Calculate the points for the vertical hexagon
-    for (int i = 0; i < 6; i++) {
-      final angle = 2.0 * i * 3.14159265359 / 6;
-      final x = centerX + radius * cos(angle);
-      final y = centerY + radius * sin(angle);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
   }
 }

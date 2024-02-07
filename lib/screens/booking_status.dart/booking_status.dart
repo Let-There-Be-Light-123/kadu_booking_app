@@ -1,17 +1,14 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:kadu_booking_app/models/booking_model.dart';
 import 'package:kadu_booking_app/providers/userdetailsprovider.dart';
 import 'package:kadu_booking_app/screens/booking_status.dart/booking_status_pdf_helper.dart';
 import 'package:kadu_booking_app/screens/propertydetails/property_detail_page.dart';
 import 'package:kadu_booking_app/theme/color.dart';
 import 'package:kadu_booking_app/ui_widgets/bulletpoints/bullet_points.dart';
+import 'package:kadu_booking_app/ui_widgets/review/review_form.dart';
 import 'package:kadu_booking_app/uihelper/uihelper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -426,7 +423,7 @@ class _BookingStatusState extends State<BookingStatus> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 250,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,9 +466,8 @@ class _BookingStatusState extends State<BookingStatus> {
                       flex: 3,
                       child: Container(
                         padding: const EdgeInsets.all(20.0),
-                        //check in container
                         color: AppColors.backgroundColorDefault,
-                        height: 80,
+                        height: 110,
                         child: Column(children: [
                           Align(
                             alignment: Alignment.centerLeft,
@@ -484,6 +480,7 @@ class _BookingStatusState extends State<BookingStatus> {
                           Text(
                             formattedCheckInDate,
                             style: GoogleFonts.poppins(fontSize: 16),
+                            softWrap: true,
                           )
                         ]),
                       ),
@@ -504,7 +501,7 @@ class _BookingStatusState extends State<BookingStatus> {
                       child: Container(
                         padding: const EdgeInsets.all(20.0),
                         color: AppColors.backgroundColorDefault,
-                        height: 80,
+                        height: 110,
                         child: Column(children: [
                           Align(
                             alignment: Alignment.centerRight,
@@ -517,6 +514,7 @@ class _BookingStatusState extends State<BookingStatus> {
                           Text(
                             formattedCheckOutDate,
                             style: GoogleFonts.poppins(fontSize: 16),
+                            softWrap: true,
                           )
                         ]),
                       ),
@@ -541,7 +539,7 @@ class _BookingStatusState extends State<BookingStatus> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          '1 Room for ${numberOfGuests} Adults',
+                          '1 Room for $numberOfGuests Adults',
                           style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w600, color: Colors.grey),
                         ),
@@ -563,26 +561,6 @@ class _BookingStatusState extends State<BookingStatus> {
                 ),
               ],
             ),
-            // verticalSpaceRegular,
-            // Container(
-            //   margin: const EdgeInsets.symmetric(horizontal: 15),
-            //   width: double.infinity,
-            //   height: 45,
-            //   child: ElevatedButton(
-            //     onPressed: () {
-            //       generateAndSavePDF(
-            //         bookingStatus,
-            //         bookingReference,
-            //         formattedCheckInDate,
-            //         formattedCheckOutDate,
-            //         daysDifference,
-            //         numberOfGuests,
-            //         userDetails,
-            //       );
-            //     },
-            //     child: const Text('Download PDF'),
-            //   ),
-            // ),
             verticalSpaceRegular,
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 15),
@@ -606,6 +584,9 @@ class _BookingStatusState extends State<BookingStatus> {
                 child: const Text('Get PDF'),
               ),
             ),
+            verticalSpaceRegular,
+            // if (bookingStatus == 'confirmed')  ReviewForm(propertyId: propertyId),
+            ReviewForm(propertyId: propertyId),
             verticalSpaceRegular,
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20.0),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kadu_booking_app/theme/color.dart';
+import 'package:kadu_booking_app/ui_widgets/hexagonalfab/hexagonal_fab.dart';
 import 'package:kadu_booking_app/uihelper/uihelper.dart';
 
 class NavBar extends StatelessWidget {
@@ -14,46 +15,46 @@ class NavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // margin: EdgeInsets.only(
-      //   bottom: Platform.isAndroid ? 16 : 0,
-      // ),
-      child: BottomAppBar(
-        elevation: 0.0,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            // height: 60,
-            color: Color(0xFFFFFFFF),
-            child: Row(
-              children: [
-                navItem(
-                  Icons.home_outlined,
-                  pageIndex == 0,
-                  'Home',
-                  onTap: () => onTap(0),
-                ),
-                navItem(
-                  Icons.edit_note,
-                  pageIndex == 1,
-                  'Bookings',
-                  onTap: () => onTap(1),
-                ),
-                const SizedBox(width: 80),
-                navItem(
-                  Icons.star_outlined,
-                  pageIndex == 2,
-                  'Favorites',
-                  onTap: () => onTap(2),
-                ),
-                navItem(
-                  Icons.menu_outlined,
-                  pageIndex == 3,
-                  'Menu',
-                  onTap: () => onTap(3),
-                ),
-              ],
-            ),
+    return BottomAppBar(
+      elevation: 0.0,
+      padding: EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: EdgeInsets.zero,
+          width: MediaQuery.of(context).size.width,
+          color: const Color(0xFFFFFFFF),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              navItem(
+                Icons.home_outlined,
+                pageIndex == 0,
+                'Home',
+                onTap: () => onTap(0),
+              ),
+              navItem(
+                Icons.edit_note,
+                pageIndex == 1,
+                'Bookings',
+                onTap: () => onTap(1),
+              ),
+              // const SizedBox(width: 80),
+              const HexagonalFab(),
+              navItem(
+                Icons.star_outlined,
+                pageIndex == 2,
+                'Favorites',
+                onTap: () => onTap(2),
+              ),
+              navItem(
+                Icons.menu_outlined,
+                pageIndex == 3,
+                'Menu',
+                onTap: () => onTap(3),
+              ),
+            ],
           ),
         ),
       ),
@@ -77,7 +78,7 @@ class NavBar extends StatelessWidget {
             ),
             Text(
               desc,
-              style: TextStyle(fontSize: 10),
+              style: const TextStyle(fontSize: 10),
             ),
           ],
         ),
