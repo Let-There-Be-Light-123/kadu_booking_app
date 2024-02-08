@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:kadu_booking_app/providers/userdetailsprovider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,6 +17,24 @@ Future<Uint8List> fetchImageFromUrl(String url) async {
 }
 
 class PdfGenerator {
+  String formatDate(String inputDate) {
+    DateTime dateTime = DateTime.parse(inputDate);
+    String formattedDate = DateFormat('E, dd MMM yyyy').format(dateTime);
+    return formattedDate;
+  }
+
+  String formatSocialSecurity(int? socialSecurityF) {
+    var socialSecurity = socialSecurityF.toString();
+    if (socialSecurity != null && socialSecurity.length == 9) {
+      String part1 = socialSecurity.substring(0, 3);
+      String part2 = socialSecurity.substring(3, 5);
+      String part3 = socialSecurity.substring(5, 9);
+      return '$part1-$part2-$part3';
+    } else {
+      return socialSecurity;
+    }
+  }
+
   Future<void> createPdf(
       Map<String, dynamic> bookingData,
       String? propertyName,
@@ -49,7 +68,7 @@ class PdfGenerator {
     final String propertyContact = roomDetails.isNotEmpty
         ? roomDetails[0]['property_details']['contact'] ?? ''
         : '';
-    final String bookingDate = bookingData['updated_at'];
+    final String bookingDate = formatDate(bookingData['updated_at']);
     final propertyImageBytes = await fetchImageFromUrl(
         '$baseUrl/storage/public/uploads/properties/${bookingData['room_details'][0]['property_details']['property_id']}/${bookingData['room_details'][0]['property_details']['files'][0]['filename']}');
     final signatureImageBytes = await fetchImageFromUrl(
@@ -69,13 +88,13 @@ class PdfGenerator {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Container(
-                        padding: pw.EdgeInsets.only(top: 10.0),
+                        padding: const pw.EdgeInsets.only(top: 10.0),
                         height: 80,
                         width: 80,
                         child: pw.Image(pw.MemoryImage(logoImageBytes)),
                       ),
                       pw.Container(
-                        padding: pw.EdgeInsets.only(top: 20.0),
+                        padding: const pw.EdgeInsets.only(top: 20.0),
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.center,
                           children: [
@@ -120,7 +139,7 @@ class PdfGenerator {
                         mainAxisAlignment: pw.MainAxisAlignment.start,
                         children: [
                           pw.SizedBox(height: 10.0),
-                          pw.Text('Booking ID: ${bookingReference}'),
+                          pw.Text('Booking ID: $bookingReference'),
                           pw.SizedBox(height: 10.0),
                           pw.Text('Booking Date: $bookingDate'),
                           pw.SizedBox(height: 10.0),
@@ -145,7 +164,7 @@ class PdfGenerator {
                             pw.SizedBox(height: 10.0),
                             pw.Text('$propertyAddress'),
                             pw.SizedBox(height: 10.0),
-                            pw.Text('Reception Phone: ${propertyContact}'),
+                            pw.Text('Reception Phone: $propertyContact'),
                             pw.SizedBox(height: 20.0),
                             pw.Container(
                               alignment: pw.Alignment.centerLeft,
@@ -247,7 +266,8 @@ class PdfGenerator {
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.Text('Social Security Number'),
-                            pw.Text('${userDetails!.socialSecurity}'),
+                            pw.Text(formatSocialSecurity(
+                                userDetails.socialSecurity)),
                           ],
                         ),
                         pw.SizedBox(height: 10),
@@ -255,7 +275,7 @@ class PdfGenerator {
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.Text('Room ID'),
-                            pw.Text('${roomId}'),
+                            pw.Text(roomId),
                           ],
                         ),
                         pw.SizedBox(height: 10),
@@ -275,21 +295,26 @@ class PdfGenerator {
                           ],
                         ),
                         pw.SizedBox(height: 40),
-                        pw.Container(
-                          padding: pw.EdgeInsets.symmetric(horizontal: 20.0),
-                          child: pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        pw.Row(
+                            mainAxisAlignment: pw.MainAxisAlignment.end,
                             children: [
-                              pw.SizedBox(
-                                height: 30,
-                                child: pw.Image(
-                                    pw.MemoryImage(signatureImageBytes)),
+                              pw.Container(
+                                padding: const pw.EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: pw.Column(
+                                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                                  children: [
+                                    pw.SizedBox(
+                                      height: 30,
+                                      child: pw.Image(
+                                          pw.MemoryImage(signatureImageBytes)),
+                                    ),
+                                    pw.SizedBox(height: 10),
+                                    pw.Text('Signature'),
+                                  ],
+                                ),
                               ),
-                              pw.SizedBox(height: 10),
-                              pw.Text('Signature'),
-                            ],
-                          ),
-                        ),
+                            ])
                       ],
                     ),
                   ),
@@ -314,11 +339,9 @@ class PdfGenerator {
                           ),
                         ),
                         pw.Container(
-                          padding: pw.EdgeInsets.only(left: 20.0),
+                          padding: const pw.EdgeInsets.only(left: 20.0),
                           child: pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment
-                                .start, // Align items to the left
-
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
                               pw.Text('SHELTER SOLUTION 360°'),
                               pw.SizedBox(height: 20),
@@ -335,7 +358,7 @@ class PdfGenerator {
                   ),
                   pw.Container(
                     height: 80,
-                    padding: pw.EdgeInsets.symmetric(horizontal: 20.0),
+                    padding: const pw.EdgeInsets.symmetric(horizontal: 20.0),
                     child: pw.Image(pw.MemoryImage(approvedImageBytes)),
                   ),
                 ],

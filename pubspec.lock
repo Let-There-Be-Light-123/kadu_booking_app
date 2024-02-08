@@ -145,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  circle_flags:
+    dependency: transitive
+    description:
+      name: circle_flags
+      sha256: d83ec86d7a24633b633af5f11a9c49ea4aa5ef97c435a0739b5d72de27f9c20d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   clean_calendar:
     dependency: "direct main"
     description:
@@ -233,6 +241,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  dart_countries:
+    dependency: transitive
+    description:
+      name: dart_countries
+      sha256: "9bfc266284bfedd88226a32903781ab237020c7d9bf0089da288c6d677b192bc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   dbus:
     dependency: transitive
     description:
@@ -265,6 +281,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.0"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.5"
   extension:
     dependency: transitive
     description:
@@ -848,6 +872,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.17.0"
+  intl_phone_field:
+    dependency: "direct main"
+    description:
+      name: intl_phone_field
+      sha256: "73819d3dfcb68d2c85663606f6842597c3ddf6688ac777f051b17814fe767bbf"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
+  intl_phone_number_input:
+    dependency: "direct main"
+    description:
+      name: intl_phone_number_input
+      sha256: "1c4328713a9503ab26a1fdbb6b00b4cada68c18aac922b35bedbc72eff1297c3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.4"
   js:
     dependency: transitive
     description:
@@ -864,6 +904,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.8.1"
+  libphonenumber_platform_interface:
+    dependency: transitive
+    description:
+      name: libphonenumber_platform_interface
+      sha256: f801f6c65523f56504b83f0890e6dad584ab3a7507dca65fec0eed640afea40f
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.2"
+  libphonenumber_plugin:
+    dependency: transitive
+    description:
+      name: libphonenumber_plugin
+      sha256: c615021d9816fbda2b2587881019ed595ecdf54d999652d7e4cce0e1f026368c
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.3"
+  libphonenumber_web:
+    dependency: transitive
+    description:
+      name: libphonenumber_web
+      sha256: "8186f420dbe97c3132283e52819daff1e55d60d6db46f7ea5ac42f42a28cc2ef"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.2"
   lints:
     dependency: transitive
     description:
@@ -1160,6 +1224,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.1"
+  phone_form_field:
+    dependency: "direct main"
+    description:
+      name: phone_form_field
+      sha256: cd43895e03e572a35ce4c7ac721895c9d49973cc793235b537d4109d4de9aad4
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.3.1"
+  phone_number_metadata:
+    dependency: transitive
+    description:
+      name: phone_number_metadata
+      sha256: "32d42fac690951941fe9ddd7fd62e79ea98fab46141ddc9e5f8322885b68f9b0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.2"
+  phone_numbers_parser:
+    dependency: transitive
+    description:
+      name: phone_numbers_parser
+      sha256: "35eb7499bed3ddce7415c75b9485ffbc5c9d87a5111c81202f64a1f6f040ddf0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   photo_manager:
     dependency: "direct main"
     description:
