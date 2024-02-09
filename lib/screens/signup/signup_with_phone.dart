@@ -10,6 +10,7 @@ import 'package:kadu_booking_app/screens/homescreen/main_screen.dart';
 import 'package:kadu_booking_app/screens/signin/signin_verify.dart';
 import 'package:kadu_booking_app/screens/verification/under_verification.dart';
 import 'package:kadu_booking_app/theme/color.dart';
+import 'package:kadu_booking_app/uihelper/mask_formatter.dart';
 import 'package:kadu_booking_app/uihelper/uihelper.dart';
 import 'package:provider/provider.dart';
 
@@ -215,8 +216,17 @@ class _MyPhoneState extends State<SignUpWithPhone> {
                     verticalSpaceRegular,
                     Material(
                       child: TextFormField(
+                        maxLength: 11,
+                        inputFormatters: [
+                          MaskedTextInputFormatter(
+                            mask: 'xxx-xx-xxxx',
+                            separator: '-',
+                          )
+                        ],
+                        keyboardType: TextInputType.number,
                         controller: socialSecurityController,
                         decoration: const InputDecoration(
+                          counterText: '',
                           labelText: 'Social Security Number',
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.all(10.0),
@@ -277,13 +287,20 @@ class _MyPhoneState extends State<SignUpWithPhone> {
                           ),
                           Expanded(
                               child: TextField(
+                            maxLength: 12,
+                            inputFormatters: [
+                              MaskedTextInputFormatter(
+                                mask: 'xxx-xxx-xxxx',
+                                separator: '-',
+                              )
+                            ],
                             controller: phoneController,
                             onChanged: (value) => phone = value,
                             keyboardType: TextInputType.phone,
                             decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "Phone",
-                            ),
+                                border: InputBorder.none,
+                                hintText: "Phone",
+                                counterText: ''),
                           ))
                         ],
                       ),

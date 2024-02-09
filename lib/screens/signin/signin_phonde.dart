@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kadu_booking_app/api/api_repository.dart';
 import 'package:kadu_booking_app/models/file_model.dart';
@@ -12,6 +13,7 @@ import 'package:kadu_booking_app/screens/signin/signin_verify.dart';
 import 'package:kadu_booking_app/screens/terms_and_privacy_policy.dart/terms_and_privacy_policy.dart';
 import 'package:kadu_booking_app/screens/verification/under_verification.dart';
 import 'package:kadu_booking_app/theme/color.dart';
+import 'package:kadu_booking_app/uihelper/mask_formatter.dart';
 import 'package:kadu_booking_app/uihelper/uihelper.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -196,6 +198,13 @@ class _MyPhoneState extends State<SignInWithPhone> {
                           Expanded(
                             child: TextFormField(
                               controller: phoneController,
+                              maxLength: 12,
+                              inputFormatters: [
+                                MaskedTextInputFormatter(
+                                  mask: 'xxx-xxx-xxxx',
+                                  separator: '-',
+                                )
+                              ],
                               keyboardType: TextInputType.phone,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -204,6 +213,7 @@ class _MyPhoneState extends State<SignInWithPhone> {
                                 return null;
                               },
                               decoration: const InputDecoration(
+                                counterText: '',
                                 border: InputBorder.none,
                                 hintText: "Phone",
                               ),
@@ -245,8 +255,7 @@ class _MyPhoneState extends State<SignInWithPhone> {
                           if (_phoneSignupKey.currentState!.validate()) {
                             String concatenatedNumber =
                                 '${countryController.text}${phoneController.text}';
-                            int phoneNumber =
-                                0; // Initialize to a default value
+                            int phoneNumber = 0;
                             _handleSignIn(context);
                             try {
                               phoneNumber = int.parse(concatenatedNumber);

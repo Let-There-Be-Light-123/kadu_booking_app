@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,7 @@ import 'package:kadu_booking_app/screens/signin/signin_verify.dart';
 import 'package:kadu_booking_app/screens/terms_and_privacy_policy.dart/terms_and_privacy_policy.dart';
 import 'package:kadu_booking_app/screens/verification/under_verification.dart';
 import 'package:kadu_booking_app/theme/color.dart';
+import 'package:kadu_booking_app/uihelper/mask_formatter.dart';
 import 'package:kadu_booking_app/uihelper/uihelper.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -291,8 +293,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     verticalSpaceRegular,
                     TextFormField(
+                      maxLength: 11,
+                      inputFormatters: [
+                        MaskedTextInputFormatter(
+                          mask: 'xxx-xx-xxxx',
+                          separator: '-',
+                        )
+                      ],
+                      keyboardType: TextInputType.number,
                       controller: socialSecurityController,
                       decoration: const InputDecoration(
+                        counterText: '',
                         labelText: 'Social Security Number',
                         border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.all(10.0),

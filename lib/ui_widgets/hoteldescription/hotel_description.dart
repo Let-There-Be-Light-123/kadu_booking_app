@@ -60,14 +60,15 @@ class _HotelDescriptionState extends State<HotelDescription> {
   final Completer<GoogleMapController> _controller = Completer();
 
   void _handleAvailabilityChange(bool isAvailable, List<Room> rooms,
-      DateTime checkInDate, DateTime checkOutDate) {
+      DateTime checkInDateF, DateTime checkOutDateF) {
     setState(() {
-      checkInDate = checkInDate;
-      checkOutDate = checkOutDate;
+      checkInDate = checkInDateF;
+      checkOutDate = checkOutDateF;
       _isAvailable = isAvailable;
       availableRooms = rooms;
     });
     widget.onAvailabilityChanged(_isAvailable);
+    debugPrint('Check in date $checkInDate $checkOutDate');
   }
 
   void _launchGoogleMaps(LatLng center) async {
@@ -86,6 +87,7 @@ class _HotelDescriptionState extends State<HotelDescription> {
 
   void _navigateToBookingScreen() {
     if (_isAvailable && availableRooms != null && availableRooms!.isNotEmpty) {
+      debugPrint('Check in date $checkInDate $checkOutDate');
       Navigator.push(
         context,
         MaterialPageRoute(

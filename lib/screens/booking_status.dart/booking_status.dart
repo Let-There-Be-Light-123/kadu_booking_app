@@ -585,9 +585,7 @@ class _BookingStatusState extends State<BookingStatus> {
               ),
             ),
             verticalSpaceRegular,
-            if (bookingStatus == 'confirmed')
-              ReviewForm(propertyId: propertyId),
-            // ReviewForm(propertyId: propertyId),
+            if (bookingStatus == 'booked') ReviewForm(propertyId: propertyId),
             verticalSpaceRegular,
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20.0),
